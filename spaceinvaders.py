@@ -1,4 +1,5 @@
 import pygame
+import random
 
 # Initialize pygame
 pygame.init()
@@ -18,9 +19,19 @@ playerY = 480
 playerX_change = 5
 playerY_change = 5
 
+# Enemy
+enemyImg = pygame.image.load("./img/monster.png")
+enemyX = random.randint(0,736) #Randomize enemy position
+enemyY = random.randint(50, 150)  # Randomize enemy position
+enemyX_change = 5
+enemyY_change = 5
+
 
 def player(x, y):
     screen.blit(playerImg, (x, y))
+
+def enemy(x, y):
+    screen.blit(enemyImg, (x, y))
 
 
 # Game Loop
@@ -40,11 +51,21 @@ while running:
             playerX += playerX_change
         
 
+    # Check player bounds
     if (playerX <= 0):
         playerX = 0
     elif (playerX >= 736):
         playerX = 736
+
+    enemyX += enemyX_change
+    # Check Enemy bounds
+    if (enemyX <= 0):
+        enemyX_change = 5
+    elif (enemyX >= 736):
+        enemyX_change = -5
+
     player(playerX, playerY)
+    enemy(enemyX, enemyY)
     pygame.display.update()
     
 
