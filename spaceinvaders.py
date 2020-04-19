@@ -22,7 +22,7 @@ def show_score(x, y):
 
 #Game Over Message
 def game_over():
-    over_text = game_over_font.render("Game Over", True, (255, 255, 255))
+    over_text = game_over_font.render("Game Over!", True, (255, 255, 255))
     screen.blit(over_text, (200, 250))
     
 
@@ -47,8 +47,8 @@ pygame.display.set_icon(icon)
 playerImg = pygame.image.load("./img/space-invaders.png")
 playerX = 370
 playerY = 480
-playerX_change = 5
-playerY_change = 5
+playerX_change = 15
+playerY_change = 15
 
 # Enemy
 enemyImg = []
@@ -63,7 +63,7 @@ for i in range(num_of_enemies):
     enemyX.append(random.randint(0, 736))
     enemyY.append(random.randint(50, 150))
     enemyX_change.append(5)
-    enemyY_change.append(50)
+    enemyY_change.append(20)
 #enemyImg = pygame.image.load("./img/enemy.png")
 #enemyX = random.randint(0,736) #Randomize enemy position
 #enemyY = random.randint(50, 150)  # Randomize enemy position
@@ -76,35 +76,41 @@ bulletImg = pygame.image.load("./img/bullet.png")
 bulletX = 0 #Temp val - will use Player's X later on
 bulletY = 480  
 bulletX_change = 5 #Not used -- bullets don't change X coordinates
-bulletY_change = 10
+bulletY_change = 15 #Bullet speed
 bullet_state = "READY"
 
+#Determine if a collision happened between Enemy and Bullet
+#From Geometry: Distance = SQRT((x2 - x1) + (y2 - y1))
 def isCollision(enemyX, enemyY, bulletX, bulletY):
     distance = math.sqrt((math.pow(enemyX - bulletX, 2)) +
                          (math.pow(enemyY - bulletY, 2)))
     if (distance < 27):
         return True
 
+#Blit the player
 def player(x, y):
     screen.blit(playerImg, (x, y))
 
+#Re-spawn the enemy at a random location if he is destroyed 
 def enemyDestroyed(index):
     global enemyX
     global enemyY
     enemyX = random.randint(0,736) #Randomize enemy position
     enemyY = random.randint(50, 150)  # Randomize enemy position
 
+#Blit the enemy
 def enemy(x, y, index):
     screen.blit(enemyImg[index], (x, y)) 
 
+#Fire and blit the bullet
 def fire_bullet(x, y):
     global bullet_state
     bullet_state = "FIRE"
     screen.blit(bulletImg, (x+16,y+10)) #Make bullet appear on center of ship
 
 
-# Game Loop
-pygame.key.set_repeat(25, 25)
+# MAIN GAME LOOP
+pygame.key.set_repeat(25, 25) #Keys held down should generate multiple key-down events
 running = True
 while running:
     pygame.event.pump()
@@ -128,8 +134,9 @@ while running:
                 fire_bullet(bulletX, playerY)
 
     #Bullet Movement
-    if (bulletY <= 0):
+    if (bulletY <= 0): #If bullet goes off top of the screen, reset to start position
         bulletY = 480
+        score_value -= 10 #Lose 10 points if you miss all enemies
         bullet_state = "READY" #Reset bullet, since it exited the screen
     if (bullet_state is "FIRE"):
         fire_bullet(bulletX, bulletY) #Use bullet start X coordinate
@@ -158,7 +165,7 @@ while running:
             enemyX_change[i] = -5
             enemyY[i] += enemyY_change[i]
 
-        #Collision
+        #Calculate whether an Enemy-Bullet Collision happened -- Dist = Sqrt((x2-x1) + (y2-y1))
         collision = isCollision(enemyX[i], enemyY[i], bulletX, bulletY)
         if (collision):
             collision_sound = mixer.Sound('./wav/explosion.wav')
@@ -170,10 +177,8 @@ while running:
             enemyX[i] = random.randint(0, 736)  # Randomize enemy position
             enemyY[i] = random.randint(50, 150)  # Randomize enemy position
         
-        enemy(enemyX[i], enemyY[i], i)
+        enemy(enemyX[i], enemyY[i], i) #Show enemy movement
 
-    player(playerX, playerY)
-    show_score(textX, textY)
-    pygame.display.update()
-    
-
+    player(playerX, playerY) #Show player movement
+    show_score(textX, textY) #Show current score
+    pygame.display.update() #This actually updates the screen
