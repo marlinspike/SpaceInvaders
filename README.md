@@ -13,5 +13,4 @@ I feel like a kid for a few seconds again! It's a really simple game -- prevent 
 * 100 for a kill
 * Minus 10 for a miss
 
-![Screenshot]
-(screenshot1.png)
+![Screenshot](https://raw.githubusercontent.com/marlinspike/spaceinvaders/master//screenshot1.png)
