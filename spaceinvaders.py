@@ -4,7 +4,16 @@ import math
 
 # Initialize pygame
 pygame.init()
-score = 0
+
+#Score
+score_value = 0
+font = pygame.font.Font('freesansbold.ttf', 32)
+textX = 10
+textY = 10
+
+def show_score(x, y):
+    score = font.render(f"Score : {score_value}", True, (255, 255, 255))
+    screen.blit(score, (x, y))
 
 # Create screen
 screen = pygame.display.set_mode((800, 600))
@@ -128,19 +137,15 @@ while running:
         if (collision):
             bulletY = 480
             bullet_state = "READY"
-            score += 100
-            print(f"Score: {score}")
+            score_value += 100
+            #print(f"Score: {score_value}")
             enemyX[i] = random.randint(0, 736)  # Randomize enemy position
             enemyY[i] = random.randint(50, 150)  # Randomize enemy position
         
         enemy(enemyX[i], enemyY[i], i)
 
     player(playerX, playerY)
-    
-
-
-
-
+    show_score(textX, textY)
     pygame.display.update()
     
 
