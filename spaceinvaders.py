@@ -6,6 +6,10 @@ pygame.init()
 
 # Create screen
 screen = pygame.display.set_mode((800, 600))
+
+#Images
+background = pygame.image.load("./img/background.png")  # Background
+bullet = pygame.image.load("./img/bullet.png")  # bullet
 icon = pygame.image.load("./img/battleship.png")
 
 # Title and Icon
@@ -20,26 +24,40 @@ playerX_change = 5
 playerY_change = 5
 
 # Enemy
-enemyImg = pygame.image.load("./img/monster.png")
+enemyImg = pygame.image.load("./img/enemy.png")
 enemyX = random.randint(0,736) #Randomize enemy position
 enemyY = random.randint(50, 150)  # Randomize enemy position
 enemyX_change = 5
 enemyY_change = 5
 
+# Bullet
+#States: READY - Can't see it; FIRE - In flight
+bulletImg = pygame.image.load("./img/bullet.png")
+bulletX = 0 #Temp val - will use Player's X later on
+bulletY = 480  
+bulletX_change = 5 #Not used -- bullets don't change X coordinates
+bulletY_change = 10
+bullet_state = "READY"
 
 def player(x, y):
     screen.blit(playerImg, (x, y))
 
 def enemy(x, y):
-    screen.blit(enemyImg, (x, y))
+    screen.blit(enemyImg, (x, y)) 
 
+def fire_bullet(x, y):
+    global bullet_state
+    bullet_state = "FIRE"
+    screen.blit(bulletImg, (x+16,y+10)) #Make bullet appear on center of ship
 
 # Game Loop
 pygame.key.set_repeat(25, 25)
 running = True
 while running:
     pygame.event.pump()
-    screen.fill((0, 100, 200))
+    screen.fill((0, 0, 0)) #fill default black background -> will be covered by image
+    #Add Background Image
+    screen.blit(background, (0,0))
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -49,7 +67,18 @@ while running:
                 playerX -= playerX_change
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
             playerX += playerX_change
-        
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            if (bullet_state is "READY"):
+                bulletX = playerX #Grab X value for bullet start point
+                fire_bullet(bulletX, playerY)
+
+    #Bullet Movement
+    if (bulletY <= 0):
+        bulletY = 480
+        bullet_state = "READY"
+    if (bullet_state is "FIRE"):
+        fire_bullet(bulletX, bulletY) #Use bullet start X coordinate
+        bulletY -= bulletY_change
 
     # Check player bounds
     if (playerX <= 0):
@@ -61,8 +90,10 @@ while running:
     # Check Enemy bounds
     if (enemyX <= 0):
         enemyX_change = 5
+        enemyY += enemyY_change
     elif (enemyX >= 736):
         enemyX_change = -5
+        enemyY += enemyY_change
 
     player(playerX, playerY)
     enemy(enemyX, enemyY)
