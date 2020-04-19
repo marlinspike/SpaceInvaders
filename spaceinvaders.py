@@ -26,11 +26,24 @@ playerX_change = 5
 playerY_change = 5
 
 # Enemy
-enemyImg = pygame.image.load("./img/enemy.png")
-enemyX = random.randint(0,736) #Randomize enemy position
-enemyY = random.randint(50, 150)  # Randomize enemy position
-enemyX_change = 5
-enemyY_change = 5
+enemyImg = []
+enemyX = []
+enemyY = []
+enemyX_change = []
+enemyY_change = []
+num_of_enemies = 5
+
+for i in range(num_of_enemies):
+    enemyImg.append(pygame.image.load("./img/enemy.png"))
+    enemyX.append(random.randint(0, 736))
+    enemyY.append(random.randint(50, 150))
+    enemyX_change.append(5)
+    enemyY_change.append(5)
+#enemyImg = pygame.image.load("./img/enemy.png")
+#enemyX = random.randint(0,736) #Randomize enemy position
+#enemyY = random.randint(50, 150)  # Randomize enemy position
+#enemyX_change = 5
+#enemyY_change = 5
 
 # Bullet
 #States: READY - Can't see it; FIRE - In flight
@@ -50,14 +63,14 @@ def isCollision(enemyX, enemyY, bulletX, bulletY):
 def player(x, y):
     screen.blit(playerImg, (x, y))
 
-def enemyDestroyed():
+def enemyDestroyed(index):
     global enemyX
     global enemyY
     enemyX = random.randint(0,736) #Randomize enemy position
     enemyY = random.randint(50, 150)  # Randomize enemy position
 
-def enemy(x, y):
-    screen.blit(enemyImg, (x, y)) 
+def enemy(x, y, index):
+    screen.blit(enemyImg[index], (x, y)) 
 
 def fire_bullet(x, y):
     global bullet_state
@@ -94,35 +107,36 @@ while running:
         fire_bullet(bulletX, bulletY) #Use bullet start X coordinate
         bulletY -= bulletY_change
 
-
-
     # Check player bounds
     if (playerX <= 0):
         playerX = 0
     elif (playerX >= 736):
         playerX = 736
     
+    # Enemy Movement
+    for i in range(num_of_enemies):
+        enemyX[i] += enemyX_change[i]
+        if (enemyX[i] <= 0):
+            enemyX_change[i] = 5
+            enemyY[i] += enemyY_change[i]
+        elif (enemyX[i] >= 736):
+            enemyX_change[i] = -5
+            enemyY[i] += enemyY_change[i]
 
-    enemyX += enemyX_change
-    # Check Enemy bounds
-    if (enemyX <= 0):
-        enemyX_change = 5
-        enemyY += enemyY_change
-    elif (enemyX >= 736):
-        enemyX_change = -5
-        enemyY += enemyY_change
-
-    #Collision
-    collision = isCollision(enemyX, enemyY, bulletX, bulletY)
-    if (collision):
-        bulletY = 480
-        bullet_state = "READY"
-        score += 100
-        print(f"Score: {score}")
-        enemyDestroyed()
+        #Collision
+        collision = isCollision(enemyX[i], enemyY[i], bulletX, bulletY)
+        if (collision):
+            bulletY = 480
+            bullet_state = "READY"
+            score += 100
+            print(f"Score: {score}")
+            enemyX[i] = random.randint(0, 736)  # Randomize enemy position
+            enemyY[i] = random.randint(50, 150)  # Randomize enemy position
+        
+        enemy(enemyX[i], enemyY[i], i)
 
     player(playerX, playerY)
-    enemy(enemyX, enemyY)
+    
 
 
 
