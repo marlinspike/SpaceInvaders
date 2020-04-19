@@ -1,8 +1,10 @@
 import pygame
 import random
+import math
 
 # Initialize pygame
 pygame.init()
+score = 0
 
 # Create screen
 screen = pygame.display.set_mode((800, 600))
@@ -39,8 +41,20 @@ bulletX_change = 5 #Not used -- bullets don't change X coordinates
 bulletY_change = 10
 bullet_state = "READY"
 
+def isCollision(enemyX, enemyY, bulletX, bulletY):
+    distance = math.sqrt((math.pow(enemyX - bulletX, 2)) +
+                         (math.pow(enemyY - bulletY, 2)))
+    if (distance < 27):
+        return True
+
 def player(x, y):
     screen.blit(playerImg, (x, y))
+
+def enemyDestroyed():
+    global enemyX
+    global enemyY
+    enemyX = random.randint(0,736) #Randomize enemy position
+    enemyY = random.randint(50, 150)  # Randomize enemy position
 
 def enemy(x, y):
     screen.blit(enemyImg, (x, y)) 
@@ -80,11 +94,14 @@ while running:
         fire_bullet(bulletX, bulletY) #Use bullet start X coordinate
         bulletY -= bulletY_change
 
+
+
     # Check player bounds
     if (playerX <= 0):
         playerX = 0
     elif (playerX >= 736):
         playerX = 736
+    
 
     enemyX += enemyX_change
     # Check Enemy bounds
@@ -95,8 +112,21 @@ while running:
         enemyX_change = -5
         enemyY += enemyY_change
 
+    #Collision
+    collision = isCollision(enemyX, enemyY, bulletX, bulletY)
+    if (collision):
+        bulletY = 480
+        bullet_state = "READY"
+        score += 100
+        print(f"Score: {score}")
+        enemyDestroyed()
+
     player(playerX, playerY)
     enemy(enemyX, enemyY)
+
+
+
+
     pygame.display.update()
     
 
