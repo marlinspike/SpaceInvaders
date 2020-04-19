@@ -14,4 +14,4 @@ I feel like a kid for a few seconds again! It's a really simple game -- prevent 
 * Minus 10 for a miss
 
 ![Screenshot]
-(https://github.com/marlinspike/SpaceInvaders/screenshot1.png)
+(screenshot1.png)
